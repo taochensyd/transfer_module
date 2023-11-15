@@ -58,9 +58,11 @@ const Transfer = () => {
     const handleSearch = async () => {
         setErrorMessage('');
         try {
-            const response = await axios.post('http://localhost:3005/api/batchinbin', { searchTerm });
+            const response = await axios.post('http://localhost:3005/api/batchinbin', { BatchNumber:searchTerm });
             if (response.data.value && response.data.value.length > 0) {
                 setBatchData(response.data.value);
+                console.log(response.data)
+                console.log(batchData)
                 const warehouses = [...new Set(response.data.value.map(item => item.WhsCode))];
                 const bins = [...new Set(response.data.value.map(item => item.BinCode))];
                 setFromWarehouseList(warehouses);
@@ -69,6 +71,7 @@ const Transfer = () => {
             } else {
                 setBatchData([]);
                 setErrorMessage('No data found for the provided search term.');
+                console.log(errorMessage)
                 setFromWarehouseList([]);
                 setFromBinList([]);
                 setAvailableQuantity(0);
