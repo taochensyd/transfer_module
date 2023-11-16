@@ -111,7 +111,6 @@ const Transfer = () => {
         if (quantity <= 0) messages.quantity = 'Quantity must be greater than zero.';
         if (quantity > availableQuantity) messages.quantity = `Quantity cannot exceed available stock (${availableQuantity}).`;
         if (new Date(postingDate) > new Date()) messages.postingDate = 'Posting date cannot be in the future.';
-        if (!remark.trim()) messages.remark = 'Remark is required.';
 
         setValidationMessages(messages);
         return Object.keys(messages).length === 0;
