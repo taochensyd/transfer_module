@@ -27,29 +27,28 @@ const Transfer = () => {
   const [validationMessages, setValidationMessages] = useState({});
   const [nextJournalMemo, setNextJournalMemo] = useState("");
 
-//   const fetchToBinLocations = async () => {
-//     console.log("Fetching to wareshouse and to bin locations...");
-//     try {
-//       const response = await axios.post(
-//         "http://localhost:3005/api/binlocations"
-//       );
-//       if (response.data.value) {
-//         const warehouses = [
-//           ...new Set(response.data.value.map((item) => item.Warehouse)),
-//         ];
-//         const bins = response.data.value;
-//         setToWarehouseList(warehouses);
-//         setToBinList(bins);
-//         console.log("To Bin Locations:", bins);
-//         console.log("To Warehouse List:", warehouses);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching to bin locations:", error);
-//     }
-//   };
+  //   const fetchToBinLocations = async () => {
+  //     console.log("Fetching to wareshouse and to bin locations...");
+  //     try {
+  //       const response = await axios.post(
+  //         "http://localhost:3005/api/binlocations"
+  //       );
+  //       if (response.data.value) {
+  //         const warehouses = [
+  //           ...new Set(response.data.value.map((item) => item.Warehouse)),
+  //         ];
+  //         const bins = response.data.value;
+  //         setToWarehouseList(warehouses);
+  //         setToBinList(bins);
+  //         console.log("To Bin Locations:", bins);
+  //         console.log("To Warehouse List:", warehouses);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching to bin locations:", error);
+  //     }
+  //   };
 
-
-const fetchToBinLocations = async () => {
+  const fetchToBinLocations = async () => {
     console.log("Fetching to warehouse and to bin locations...");
     try {
       const response = await axios.post(
@@ -69,7 +68,6 @@ const fetchToBinLocations = async () => {
       console.error("Error fetching to bin locations:", error);
     }
   };
-  
 
   useEffect(() => {
     const filteredBins = toBinList.filter(
@@ -275,6 +273,8 @@ const fetchToBinLocations = async () => {
   };
 
   const postTransfer = async () => {
+    let toBinAbsEntry = toBinList.find(item => item.BinCode === toBin).AbsEntry;
+    let fromBinAbsEntry = toBinList.find(item => item.BinCode === fromBin).AbsEntry;
     const url = "http://localhost:3005/api/stocktransfer";
     const data = {
       JournalMemo: nextJournalMemo, // Assumed to be a state variable or a constant
@@ -296,18 +296,77 @@ const fetchToBinLocations = async () => {
             },
           ],
           StockTransferLinesBinAllocations: [
-            {
-              BinAbsEntry: item.BinAbs,
-              BinActionType:
-                item.BinCode === fromBin
-                  ? "batFromWarehouse"
-                  : "batToWarehouse",
-              Quantity: quantity,
-              SerialAndBatchNumbersBaseLine: 0,
-            },
-          ],
+                            {
+                                BinAbsEntry: fromBinAbsEntry, // Using fromBinData
+                                BinActionType: "batFromWarehouse",
+                                Quantity: quantity,
+                                SerialAndBatchNumbersBaseLine: 0
+                            },
+                            {
+                                BinAbsEntry: toBinAbsEntry, // Using toBinData
+                                BinActionType: "batToWarehouse",
+                                Quantity: quantity,
+                                SerialAndBatchNumbersBaseLine: 0
+                            }
+                        ]
         })),
     };
+
+
+        //   StockTransferLinesBinAllocations: [
+        //     {
+        //       BinAbsEntry: item.BinAbs,
+        //       BinActionType:
+        //         item.BinCode === fromBin
+        //           ? "batFromWarehouse"
+        //           : "batToWarehouse",
+        //       Quantity: quantity,
+        //       SerialAndBatchNumbersBaseLine: 0,
+        //     },
+        //   ],
+
+
+
+    //   const postTransfer = async () => {
+    //     const url = "http://localhost:3005/api/stocktransfer";
+    //     const fromBinData = batchData.find(item => item.BinCode === fromBin);
+    // const toBinData = batchData.find(item => item.BinCode === toBin);
+
+    // const data = {
+    //     "JournalMemo": nextJournalMemo,
+    //     "Comments": remark,
+    //     "FromWarehouse": fromWarehouse,
+    //     "ToWarehouse": toWarehouse,
+    //     "StockTransferLines": [
+    //         {
+    //             "ItemCode": batchData[0]?.ItemCode,
+    //             "Quantity": quantity,
+    //             "WarehouseCode": toWarehouse,
+    //             "FromWarehouseCode": fromBinData?.WhsCode, // Using fromBinData
+    //             "SerialNumbers": [],
+    //             "BatchNumbers": [
+    //                 {
+    //                     "BatchNumber": batchData[0]?.DistNumber,
+    //                     "Quantity": quantity
+    //                 }
+    //             ],
+    //             "StockTransferLinesBinAllocations": [
+    //                 {
+    //                     "BinAbsEntry": fromBinData?.BinAbs, // Using fromBinData
+    //                     "BinActionType": "batFromWarehouse",
+    //                     "Quantity": quantity,
+    //                     "SerialAndBatchNumbersBaseLine": 0
+    //                 },
+    //                 {
+    //                     "BinAbsEntry": toBinData?.BinAbs, // Using toBinData
+    //                     "BinActionType": "batToWarehouse",
+    //                     "Quantity": quantity,
+    //                     "SerialAndBatchNumbersBaseLine": 0
+    //                 }
+    //             ]
+    //         }
+    //     ]
+    // };
 
     try {
       const response = await axios.post(url, data);
