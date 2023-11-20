@@ -273,8 +273,12 @@ const Transfer = () => {
   };
 
   const postTransfer = async () => {
-    let toBinAbsEntry = toBinList.find(item => item.BinCode === toBin).AbsEntry;
-    let fromBinAbsEntry = toBinList.find(item => item.BinCode === fromBin).AbsEntry;
+    let toBinAbsEntry = toBinList.find(
+      (item) => item.BinCode === toBin
+    ).AbsEntry;
+    let fromBinAbsEntry = toBinList.find(
+      (item) => item.BinCode === fromBin
+    ).AbsEntry;
     const url = "http://localhost:3005/api/stocktransfer";
     const data = {
       JournalMemo: nextJournalMemo, // Assumed to be a state variable or a constant
@@ -296,77 +300,21 @@ const Transfer = () => {
             },
           ],
           StockTransferLinesBinAllocations: [
-                            {
-                                BinAbsEntry: fromBinAbsEntry, // Using fromBinData
-                                BinActionType: "batFromWarehouse",
-                                Quantity: quantity,
-                                SerialAndBatchNumbersBaseLine: 0
-                            },
-                            {
-                                BinAbsEntry: toBinAbsEntry, // Using toBinData
-                                BinActionType: "batToWarehouse",
-                                Quantity: quantity,
-                                SerialAndBatchNumbersBaseLine: 0
-                            }
-                        ]
+            {
+              BinAbsEntry: fromBinAbsEntry, // Using fromBinData
+              BinActionType: "batFromWarehouse",
+              Quantity: quantity,
+              SerialAndBatchNumbersBaseLine: 0,
+            },
+            {
+              BinAbsEntry: toBinAbsEntry, // Using toBinData
+              BinActionType: "batToWarehouse",
+              Quantity: quantity,
+              SerialAndBatchNumbersBaseLine: 0,
+            },
+          ],
         })),
     };
-
-
-        //   StockTransferLinesBinAllocations: [
-        //     {
-        //       BinAbsEntry: item.BinAbs,
-        //       BinActionType:
-        //         item.BinCode === fromBin
-        //           ? "batFromWarehouse"
-        //           : "batToWarehouse",
-        //       Quantity: quantity,
-        //       SerialAndBatchNumbersBaseLine: 0,
-        //     },
-        //   ],
-
-
-
-    //   const postTransfer = async () => {
-    //     const url = "http://localhost:3005/api/stocktransfer";
-    //     const fromBinData = batchData.find(item => item.BinCode === fromBin);
-    // const toBinData = batchData.find(item => item.BinCode === toBin);
-
-    // const data = {
-    //     "JournalMemo": nextJournalMemo,
-    //     "Comments": remark,
-    //     "FromWarehouse": fromWarehouse,
-    //     "ToWarehouse": toWarehouse,
-    //     "StockTransferLines": [
-    //         {
-    //             "ItemCode": batchData[0]?.ItemCode,
-    //             "Quantity": quantity,
-    //             "WarehouseCode": toWarehouse,
-    //             "FromWarehouseCode": fromBinData?.WhsCode, // Using fromBinData
-    //             "SerialNumbers": [],
-    //             "BatchNumbers": [
-    //                 {
-    //                     "BatchNumber": batchData[0]?.DistNumber,
-    //                     "Quantity": quantity
-    //                 }
-    //             ],
-    //             "StockTransferLinesBinAllocations": [
-    //                 {
-    //                     "BinAbsEntry": fromBinData?.BinAbs, // Using fromBinData
-    //                     "BinActionType": "batFromWarehouse",
-    //                     "Quantity": quantity,
-    //                     "SerialAndBatchNumbersBaseLine": 0
-    //                 },
-    //                 {
-    //                     "BinAbsEntry": toBinData?.BinAbs, // Using toBinData
-    //                     "BinActionType": "batToWarehouse",
-    //                     "Quantity": quantity,
-    //                     "SerialAndBatchNumbersBaseLine": 0
-    //                 }
-    //             ]
-    //         }
-    //     ]
-    // };
 
     try {
       const response = await axios.post(url, data);
@@ -388,7 +336,7 @@ const Transfer = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="input"
+            className="input requireInput"
           />
         </label>
         <button onClick={handleSearch} className="button">
@@ -396,25 +344,25 @@ const Transfer = () => {
         </button>
       </div>
       <div className="results">
-        {renderField("Item Code", batchData[0]?.ItemCode)}
-        {renderField("Item Name", batchData[0]?.ItemName)}
-        {renderField("Batch Number", batchData[0]?.DistNumber)}
+        {renderField("Item Code", batchData[0]?.ItemCode, "displayOnly")}
+        {renderField("Item Name", batchData[0]?.ItemName, "displayOnly")}
+        {renderField("Batch Number", batchData[0]?.DistNumber, "displayOnly")}
 
         {renderDropdown("From Warehouse", fromWarehouse, setFromWarehouse, [
-          "",
+          "Source Warehouse",
           ...fromWarehouseList,
         ])}
-        {renderDropdown("From Bin Code", fromBin, setFromBin, [
-          "",
+        {renderDropdown("From Bin", fromBin, setFromBin, [
+          "Source Bin",
           ...filteredFromBinList,
         ])}
 
         {renderDropdown("To Warehouse", toWarehouse, setToWarehouse, [
-          "",
+          "Destination Warehouse",
           ...toWarehouseList,
         ])}
-        {renderDropdown("To Bin Code", toBin, setToBin, [
-          "",
+        {renderDropdown("To Bin", toBin, setToBin, [
+          "Destination Bin",
           ...filteredToBinList,
         ])}
 
@@ -477,18 +425,26 @@ const Transfer = () => {
   );
 };
 
+// const renderField = (label, value) => (
+//   <div className="fieldRow">
+//     <span className="fieldLabel">{label}:</span>
+//     <span className="fieldValue">{value !== undefined ? value : ""}</span>
+//   </div>
+// );
+
 const renderField = (label, value) => (
   <div className="fieldRow">
     <span className="fieldLabel">{label}:</span>
-    <span className="fieldValue">{value !== undefined ? value : ""}</span>
+    <span className="fieldValue displayOnly">{value !== undefined ? value : ""}</span>
   </div>
 );
+
 
 const renderDropdown = (label, value, setValue, options) => (
   <div className="fieldRow">
     <span className="fieldLabel">{label}:</span>
     <select
-      className="dropdown"
+      className="dropdown requireInput"
       value={value}
       onChange={(e) => setValue(e.target.value)}
     >

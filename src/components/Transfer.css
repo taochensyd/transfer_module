@@ -106,3 +106,12 @@
     color: red;
     font-size: 0.9em;
 }
+
+.displayOnly {
+  background: linear-gradient(to left, #DBDBDB 0%, #DBDBDB 400px, transparent 100px);
+}
+
+
+.requireInput {
+  background: linear-gradient(to left, #FFFFCC 0%, #FFFFCC 400px, transparent 100px);
+}
