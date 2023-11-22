@@ -28,7 +28,7 @@
     width: calc(100% - 20px);
   }
   
-  .button {
+  /* .button {
     padding: 8px 15px;
     margin-left: 10px;
     border: none;
@@ -37,7 +37,7 @@
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;
-  }
+  } */
   
   .error {
     color: red;
@@ -92,15 +92,67 @@
     margin-bottom: 20px;
 }
 
-.button.confirm {
-    background-color: #4CAF50; /* Green */
+
+/* .button.confirm {
+    background-color: #4CAF50; 
     color: white;
 }
 
 .button.abort {
-    background-color: #f44336; /* Red */
+    background-color: #f44336; 
     color: white;
 }
+
+.button.clearall {
+  background-color: yellow; 
+  color: white;
+}
+
+.button.transfer {
+  background-color: blue; 
+  color: white;
+} */
+
+/* Transfer Button */
+
+
+/* Base button styles */
+.button {
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Button hover styles */
+.button:hover {
+  opacity: 0.8;
+}
+
+/* Individual button colors */
+.button.transfer {
+  background-color: #4997D0;
+}
+
+.button.clearAll {
+  background-color: #008CBA; /* Blue */
+}
+
+.button.abort {
+  background-color: #f44336; /* Red */
+}
+
+.button.confirm {
+  background-color: #555555; /* Dark Gray */
+}
+
+
 
 .validationMessages .error {
     color: red;
@@ -114,4 +166,5 @@
 
 .requireInput {
   background: linear-gradient(to left, #FFFFCC 0%, #FFFFCC 400px, transparent 100px);
+  max-width: 380px;
 }

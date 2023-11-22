@@ -26,27 +26,32 @@ const Transfer = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [validationMessages, setValidationMessages] = useState({});
   const [nextJournalMemo, setNextJournalMemo] = useState("");
+  const [uomName, setUomName] = useState("");
 
-  //   const fetchToBinLocations = async () => {
-  //     console.log("Fetching to wareshouse and to bin locations...");
-  //     try {
-  //       const response = await axios.post(
-  //         "http://localhost:3005/api/binlocations"
-  //       );
-  //       if (response.data.value) {
-  //         const warehouses = [
-  //           ...new Set(response.data.value.map((item) => item.Warehouse)),
-  //         ];
-  //         const bins = response.data.value;
-  //         setToWarehouseList(warehouses);
-  //         setToBinList(bins);
-  //         console.log("To Bin Locations:", bins);
-  //         console.log("To Warehouse List:", warehouses);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching to bin locations:", error);
-  //     }
-  //   };
+  const consoleLogVariables = () => {
+    console.log("searchTerm: ", searchTerm);
+    console.log("batchData: ", batchData);
+    console.log("errorMessage: ", errorMessage);
+    console.log("fromWarehouse: ", fromWarehouse);
+    console.log("fromBin: ", fromBin);
+    console.log("toWarehouse: ", toWarehouse);
+    console.log("toBin: ", toBin);
+    console.log("quantity: ", quantity);
+    console.log("availableQuantity: ", availableQuantity);
+    console.log("postingDate: ", postingDate);
+    console.log("remark: ", remark);
+    console.log("fromWarehouseList: ", fromWarehouseList);
+    console.log("fromBinList: ", fromBinList);
+    console.log("toWarehouseList: ", toWarehouseList);
+    console.log("toBinList: ", toBinList);
+    console.log("filteredFromBinList: ", filteredFromBinList);
+    console.log("filteredToBinList: ", filteredToBinList);
+    console.log("transferSummary: ", transferSummary);
+    console.log("showConfirmation: ", showConfirmation);
+    console.log("validationMessages: ", validationMessages);
+    console.log("nextJournalMemo: ", nextJournalMemo);
+    console.log("uomName: ", uomName);
+  };
 
   const fetchToBinLocations = async () => {
     console.log("Fetching to warehouse and to bin locations...");
@@ -147,6 +152,32 @@ const Transfer = () => {
   useEffect(() => {
     fetchToBinLocations();
   }, []);
+
+  useEffect(() => {
+    if (batchData.length > 0) {
+      fetchUomName();
+    } else {
+      setUomName("");
+    }
+  }, [batchData]);
+  
+
+  const fetchUomName = async () => {
+    if (batchData.length === 0) {
+      setUomName("");
+      return;
+    }
+    try {
+      const response = await axios.post("http://localhost:3005/api/items", {
+        ItemNumber: batchData[0].ItemCode,
+      });
+      if (response.data && response.data.value > 0) {
+        setUomName(response.data.InventoryUOM);
+      }
+    } catch (error) {
+      console.error("Error fetching item data:", error);
+    }
+  };
 
   const validateFields = () => {
     let messages = {};
@@ -366,6 +397,8 @@ const Transfer = () => {
           ...filteredToBinList,
         ])}
 
+        {renderField("UoM Name", uomName, "displayOnly")}
+
         <div className="fieldRow">
           <span className="fieldLabel">
             Quantity (Available: {availableQuantity}):
@@ -374,7 +407,7 @@ const Transfer = () => {
             type="number"
             value={quantity}
             onChange={handleQuantityChange}
-            className="input"
+            className="input requireInput"
           />
         </div>
         <div className="fieldRow">
@@ -383,7 +416,7 @@ const Transfer = () => {
             type="date"
             value={postingDate}
             onChange={handlePostingDateChange}
-            className="input"
+            className="input requireInput"
             max={new Date().toISOString().split("T")[0]}
           />
         </div>
@@ -392,15 +425,15 @@ const Transfer = () => {
           <textarea
             value={remark}
             onChange={(e) => setRemark(e.target.value)}
-            className="input"
+            className="input requireInput"
             style={{ height: "100px" }}
           />
         </div>
         <div className="actionButtons">
-          <button onClick={handleTransferClick} className="button">
+          <button onClick={handleTransferClick} className="button transfer">
             Transfer
           </button>
-          <button onClick={handleClearAll} className="button">
+          <button onClick={handleClearAll} className="button clearAll">
             Clear All
           </button>
         </div>
@@ -412,10 +445,10 @@ const Transfer = () => {
                 <li key={key}>{`${key}: ${value}`}</li>
               ))}
             </ul>
-            <button onClick={handleConfirmTransfer} className="button">
+            <button onClick={handleConfirmTransfer} className="button confirm">
               Confirm
             </button>
-            <button onClick={handleAbortTransfer} className="button">
+            <button onClick={handleAbortTransfer} className="button abort">
               Abort
             </button>
           </div>
@@ -425,20 +458,15 @@ const Transfer = () => {
   );
 };
 
-// const renderField = (label, value) => (
-//   <div className="fieldRow">
-//     <span className="fieldLabel">{label}:</span>
-//     <span className="fieldValue">{value !== undefined ? value : ""}</span>
-//   </div>
-// );
 
 const renderField = (label, value) => (
   <div className="fieldRow">
     <span className="fieldLabel">{label}:</span>
-    <span className="fieldValue displayOnly">{value !== undefined ? value : ""}</span>
+    <span className="fieldValue displayOnly">
+      {value !== undefined ? value : ""}
+    </span>
   </div>
 );
-
 
 const renderDropdown = (label, value, setValue, options) => (
   <div className="fieldRow">
